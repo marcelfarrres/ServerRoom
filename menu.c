@@ -11,13 +11,14 @@
 #define INITIAL_LOG_POSITION 3
 #define FINISH_SEND_LENGTH 5
 #define TOTAL_LOGS_POSITION 0
-#define ACTUAL_LOGS_POSITION 1
+#define INDEX_LOGS_POSITION 1
 
 
 static unsigned char finArray[FINISH_SEND_LENGTH] = "FIN\r\n";
 static unsigned char inputCommand[50];
 
-static unsigned char totalLogsStored = 3;
+static unsigned char totalLogsStored = 2;
+static unsigned char lastLogStored = 2;
 
 static unsigned char arrayPrefixes[4][3] = {
     "LOG",
@@ -38,10 +39,7 @@ char checkINIT(){
 char checkLOGS(){
     if(inputCommand[0] == 'L' && inputCommand[1] == 'O' && inputCommand[2] == 'G' && inputCommand[3] == 'S' ){
         return 1;
-       
-
     }else{
-        
         return 0;
     }
 }
@@ -52,7 +50,6 @@ void menuMotor(void) {
 	static unsigned char state = 0;
     
     static unsigned char i = 0;
-    static unsigned char u = 0;
     static unsigned char a = 0;
     static unsigned char totalLogsSended = 0;
    
@@ -85,9 +82,10 @@ void menuMotor(void) {
 			state = 0;
 			if (checkLOGS()) {
 				i = 0;
-				u = 0;
 				a = INITIAL_LOG_POSITION;
 				totalLogsSended = 0;
+				totalLogsStored = readEPROM(0);
+				lastLogStored = readEPROM(1);
 				state = 4;
 			}
 		break;
@@ -108,9 +106,9 @@ void menuMotor(void) {
 		break;
 		case 6:
 			if (numSentCorrectly()) {
-				sendBits(readEPROM(a + u));
+				sendBits(readEPROM(a + (lastLogStored * 14)) + '0');
 				a++;
-				state = 7;
+				state = 13;
 			}
 		break;
 		case 7:
@@ -119,8 +117,8 @@ void menuMotor(void) {
 			}
 			else if (a >= LOG_LENGTH + INITIAL_LOG_POSITION) {
 				a = INITIAL_LOG_POSITION;
-				u = u + LOG_LENGTH;
 				totalLogsSended++;
+				lastLogStored++;
 				state = 8;
 			}
 		break;
@@ -152,13 +150,37 @@ void menuMotor(void) {
 			}
 		break;
 		case 10:
-			if (totalLogsSended < totalLogsStored) {
+			if (totalLogsSended < totalLogsStored && lastLogStored < 15) {
 				i = 0;
 				state = 4;
 			}
 			else if (totalLogsSended >= totalLogsStored) {
 				a = 0;
 				state = 11;
+			}
+			else if (totalLogsSended < totalLogsStored && lastLogStored >= 15) {
+				i = 0;
+				lastLogStored = 0;
+				state = 4;
+			}
+		break;
+		case 13:
+			if (numSentCorrectly()) {
+				sendBits(readEPROM(a + (lastLogStored * 14)) + '0');
+				a++;
+				state = 14;
+			}
+		break;
+		case 14:
+			if (numSentCorrectly()) {
+				if(a < 9){
+					sendBits(':');
+				}else if(a == 9){
+					sendBits(' ');
+				}else if(a > 9 && a < 15){
+					sendBits('/');
+				}
+				state = 7;
 			}
 		break;
 	}

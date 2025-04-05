@@ -67,18 +67,74 @@ void main(void){
     LATAbits.LA4 = 0;
     
     //EPROM ESCRITO MANUAL-----------------------------
+    //TOTAL ESCRITOS
+    writeEEPROM(0, 15);
+    while(stillWriting());
+    //ULTIMO ESCRITO
+    writeEEPROM(1, 2);
+    while(stillWriting());
+    
     for(int r = 3; r < 17; r++){
-        writeEEPROM(r,'1');
+        writeEEPROM(r,1);
         while(stillWriting());
     }
     for(int r = 17; r < 31; r++){
-        writeEEPROM(r,'2');
+        writeEEPROM(r,2);
         while(stillWriting());
     }
     for(int r = 31; r < 45; r++){
-        writeEEPROM(r,'3');
+        writeEEPROM(r,3);
         while(stillWriting());
     }
+    for(int r = 45; r < 59; r++){
+        writeEEPROM(r,4);
+        while(stillWriting());
+    }
+    for(int r = 59; r < 72; r++){
+        writeEEPROM(r,5);
+        while(stillWriting());
+    }
+    for(int r = 72; r < 87; r++){
+        writeEEPROM(r,6);
+        while(stillWriting());
+    }
+    for(int r = 87; r < 101; r++){
+        writeEEPROM(r,7);
+        while(stillWriting());
+    }
+    for(int r = 101; r < 115; r++){
+        writeEEPROM(r,8);
+        while(stillWriting());
+    }
+    for(int r = 115; r < 129; r++){
+        writeEEPROM(r,9);
+        while(stillWriting());
+    }
+    for(int r = 129; r < 143; r++){
+        writeEEPROM(r,0);
+        while(stillWriting());
+    }
+    for(int r = 143; r < 157; r++){
+        writeEEPROM(r,0);
+        while(stillWriting());
+    }
+    for(int r = 157; r < 171; r++){
+        writeEEPROM(r,1);
+        while(stillWriting());
+    }
+    for(int r = 171; r < 185; r++){
+        writeEEPROM(r,1);
+        while(stillWriting());
+    }
+    for(int r = 185; r < 199; r++){
+        writeEEPROM(r,0);
+        while(stillWriting());
+    }
+    for(int r = 199; r < 213; r++){
+        writeEEPROM(r,0);
+        while(stillWriting());
+    }
+    
     
 	while(1){
         
