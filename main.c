@@ -66,9 +66,22 @@ void main(void){
     LATAbits.LA3 = 0;
     LATAbits.LA4 = 0;
     
+    //EPROM ESCRITO MANUAL-----------------------------
+    for(int r = 3; r < 17; r++){
+        writeEEPROM(r,'1');
+        while(stillWriting());
+    }
+    for(int r = 17; r < 31; r++){
+        writeEEPROM(r,'2');
+        while(stillWriting());
+    }
+    for(int r = 31; r < 45; r++){
+        writeEEPROM(r,'3');
+        while(stillWriting());
+    }
     
 	while(1){
-         
+        
         adcConversionMotor();
         logic_joystickMotor();
         menuMotor();
