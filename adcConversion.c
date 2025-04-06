@@ -6,7 +6,7 @@
 
 
 
-#define NUM_OF_ANS 2
+#define NUM_OF_ANS 3
 
 static int ansArray[NUM_OF_ANS];
 
@@ -57,4 +57,8 @@ int getXjoystick(){
 int getYjoystick(){
 
     return ansArray[1];
+}
+
+int getTemp(){
+    return ansArray[2];
 }

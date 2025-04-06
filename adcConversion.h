@@ -5,6 +5,7 @@ void adcConversionMotor(void);
 
 int getXjoystick();
 int getYjoystick();
+int getTemp();
 
 
 #endif	

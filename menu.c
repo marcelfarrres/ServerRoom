@@ -4,6 +4,7 @@
 
 #include "eusart_interface.h"
 #include "eprom.h"
+#include "adcConversion.h"
 
 
 
@@ -17,8 +18,8 @@
 static unsigned char finArray[FINISH_SEND_LENGTH] = "FIN\r\n";
 static unsigned char inputCommand[50];
 
-static unsigned char totalLogsStored = 2;
-static unsigned char lastLogStored = 2;
+static unsigned char totalLogsStored;
+static unsigned char lastLogStored;
 
 static unsigned char arrayPrefixes[4][3] = {
     "LOG",
@@ -44,6 +45,55 @@ char checkLOGS(){
     }
 }
 
+char checkGraf(){
+    if(inputCommand[0] == 'G' && inputCommand[1] == 'R' && inputCommand[2] == 'A' && inputCommand[3] == 'F' ){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+
+void sendIntAsASCII(unsigned int num) {
+    unsigned char d;
+
+    // Miles (solo si el número es >= 1000)
+    if (num >= 1000) {
+        d = num / 1000;
+        sendBits(d + '0');
+        while (!numSentCorrectly());
+        num %= 1000;
+    }
+
+    // Centenas
+    if (num >= 100 || num >= 1000) {
+        d = num / 100;
+        sendBits(d + '0');
+        while (!numSentCorrectly());
+        num %= 100;
+    } else if (num >= 10) {
+        // Si no hay centenas pero hay decenas, poner '0' delante
+        sendBits('0');
+        while (!numSentCorrectly());
+    }
+
+    // Decenas
+    if (num >= 10) {
+        d = num / 10;
+        sendBits(d + '0');
+        while (!numSentCorrectly());
+        num %= 10;
+    } else if (num < 10 && num < 100) {
+        // Si es un número como 007, añadir ceros delante
+        sendBits('0');
+        while (!numSentCorrectly());
+    }
+
+    // Unidades
+    sendBits(num + '0');
+    while (!numSentCorrectly());
+}
+
 
 
 void menuMotor(void) {
@@ -56,6 +106,14 @@ void menuMotor(void) {
 
 	switch(state) {
 		case 0:
+             
+            /*
+            sendIntAsASCII(getTemp());
+            while (!numSentCorrectly());
+            sendBits('\r');
+            while (!numSentCorrectly());
+            sendBits('\n');
+            */
 			if (numReceivedAtRCREG()) {
 				i = 0;
 				inputCommand[i] = receiveNumber();
@@ -71,10 +129,10 @@ void menuMotor(void) {
 			}
 		break;
 		case 2:
-			if (inputCommand[i - 1] != '\n') {
+			if (inputCommand[i - 1] != '=') {
 				state = 1;
 			}
-			else if (inputCommand[i - 1] == '\n') {
+			else if (inputCommand[i - 1] == '=') {
 				state = 3;
 			}
 		break;
@@ -86,7 +144,7 @@ void menuMotor(void) {
 				totalLogsSended = 0;
 				totalLogsStored = readEPROM(0);
 				lastLogStored = readEPROM(1);
-				state = 4;
+				state = 10;
 			}
 		break;
 		case 4:
@@ -150,7 +208,7 @@ void menuMotor(void) {
 			}
 		break;
 		case 10:
-			if (totalLogsSended < totalLogsStored && lastLogStored < 15) {
+			if (totalLogsSended < totalLogsStored && lastLogStored < totalLogsStored) {
 				i = 0;
 				state = 4;
 			}
@@ -158,7 +216,7 @@ void menuMotor(void) {
 				a = 0;
 				state = 11;
 			}
-			else if (totalLogsSended < totalLogsStored && lastLogStored >= 15) {
+			else if (totalLogsSended < totalLogsStored && lastLogStored >= totalLogsStored) {
 				i = 0;
 				lastLogStored = 0;
 				state = 4;

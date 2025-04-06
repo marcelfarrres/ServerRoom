@@ -7,8 +7,9 @@ void AD_Init(){
     
     TRISAbits.TRISA0 = 1;
     TRISAbits.TRISA1 = 1;
-    ADCON1 = 0b00001101; // AN0-AN1 as analog and Vmax and Vmin Default 0-5V
-    ADCON2 = 0b10001011; //Right justified and time and clock bits
+    TRISAbits.TRISA2 = 1;
+    ADCON1 = 0b00001100; // AN0-AN1-AN2 as analog and Vmax and Vmin Default 0-5V
+    ADCON2 = 0b10011110; //Right justified and time and clock bits
     ADCON0bits.ADON = 1;
 
 }

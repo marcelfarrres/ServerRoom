@@ -60,18 +60,17 @@ void main(void){
     initEusart();
     
     
-    TRISAbits.RA3 = 0;
-    TRISAbits.RA4 = 0;
+    TRISAbits.RA3 = 1;
+   
     
-    LATAbits.LA3 = 0;
-    LATAbits.LA4 = 0;
+    
     
     //EPROM ESCRITO MANUAL-----------------------------
     //TOTAL ESCRITOS
     writeEEPROM(0, 15);
     while(stillWriting());
     //ULTIMO ESCRITO
-    writeEEPROM(1, 2);
+    writeEEPROM(1, 15);
     while(stillWriting());
     
     for(int r = 3; r < 17; r++){
@@ -90,11 +89,11 @@ void main(void){
         writeEEPROM(r,4);
         while(stillWriting());
     }
-    for(int r = 59; r < 72; r++){
+    for(int r = 59; r < 73; r++){
         writeEEPROM(r,5);
         while(stillWriting());
     }
-    for(int r = 72; r < 87; r++){
+    for(int r = 73; r < 87; r++){
         writeEEPROM(r,6);
         while(stillWriting());
     }
@@ -132,6 +131,10 @@ void main(void){
     }
     for(int r = 199; r < 213; r++){
         writeEEPROM(r,0);
+        while(stillWriting());
+    }
+    for(int r = 213; r < 226; r++){
+        writeEEPROM(r,7);
         while(stillWriting());
     }
     
