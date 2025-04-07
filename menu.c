@@ -94,7 +94,33 @@ void sendIntAsASCII(unsigned int num) {
     while (!numSentCorrectly());
 }
 
+void printTemp(){
+    sendIntAsASCII(getTemp());
+    while (!numSentCorrectly());
+    sendBits('\r');
+    while (!numSentCorrectly());
+    sendBits('\n');
+}
 
+void printCommand(){
+    while(!numSentCorrectly());
+            sendBits(arrayPrefixes[0][0]);
+            while(!numSentCorrectly());
+            sendBits(arrayPrefixes[0][1]);
+            while(!numSentCorrectly());
+            sendBits(arrayPrefixes[0][2]);
+            while(!numSentCorrectly());
+            sendBits('-');
+            for(int re = 0; re < 10; re++){
+                while(!numSentCorrectly());
+                sendBits(inputCommand[re]);
+
+            }
+            while(!numSentCorrectly());
+            sendBits('-');
+            while(!numSentCorrectly());
+            sendBits('\n');
+}
 
 void menuMotor(void) {
 	static unsigned char state = 0;
@@ -107,13 +133,10 @@ void menuMotor(void) {
 	switch(state) {
 		case 0:
              
-            /*
-            sendIntAsASCII(getTemp());
-            while (!numSentCorrectly());
-            sendBits('\r');
-            while (!numSentCorrectly());
-            sendBits('\n');
-            */
+            //printTEMP----------------
+            //printTemp();
+            //-------------------------
+            
 			if (numReceivedAtRCREG()) {
 				i = 0;
 				inputCommand[i] = receiveNumber();
@@ -129,16 +152,20 @@ void menuMotor(void) {
 			}
 		break;
 		case 2:
-			if (inputCommand[i - 1] != '=') {
+			if (inputCommand[i - 1] != '\n') {
 				state = 1;
 			}
-			else if (inputCommand[i - 1] == '=') {
+			else if (inputCommand[i - 1] == '\n') {
 				state = 3;
 			}
 		break;
 		case 3:
 			state = 0;
+            //COMMAND SEND:------------------------------
+            printCommand();
+            //-------------------------------------------
 			if (checkLOGS()) {
+                
 				i = 0;
 				a = INITIAL_LOG_POSITION;
 				totalLogsSended = 0;

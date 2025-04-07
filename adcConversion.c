@@ -9,6 +9,7 @@
 #define NUM_OF_ANS 3
 
 static int ansArray[NUM_OF_ANS];
+static int goofyAhhCounter = 0;
 
 
 void adcConversionMotor(void) {
@@ -41,9 +42,17 @@ void adcConversionMotor(void) {
 		break;
 		case 4:
 			if (AD_SampleAvailable() == 1) {
-				ansArray[i] = AD_GetSample_10bits();
-				i++;
-				state = 3;
+                goofyAhhCounter++;
+                if(i == 2 && goofyAhhCounter >= 300){
+                        ansArray[i] = AD_GetSample_10bits(); //TODO dividir multiplicar y calculos necesarios
+                        goofyAhhCounter = 0;
+                  
+                }else{
+                    ansArray[i] = AD_GetSample_10bits();
+                    
+                }
+                i++;
+                state = 3;
 			}
 		break;
 	}

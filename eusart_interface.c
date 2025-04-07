@@ -14,8 +14,8 @@ void initEusart(void){
     TXSTAbits.SYNC = 0;
     BAUDCONbits.BRG16 = 1;
     TXSTAbits.BRGH = 1;
-    SPBRGH = (86 >> 8) & 0xFF;  //1040 for 9600     86 for 115k   520 for 19k
-    SPBRG  = 86 & 0xFF;         
+    SPBRGH = (1040 >> 8) & 0xFF;  //1040 for 9600     86 for 115k   520 for 19k
+    SPBRG  = 1040 & 0xFF;         
 
 
     

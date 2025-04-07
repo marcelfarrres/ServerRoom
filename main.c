@@ -70,7 +70,7 @@ void main(void){
     writeEEPROM(0, 15);
     while(stillWriting());
     //ULTIMO ESCRITO
-    writeEEPROM(1, 15);
+    writeEEPROM(1, 4);
     while(stillWriting());
     
     for(int r = 3; r < 17; r++){
