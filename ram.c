@@ -19,6 +19,14 @@ void ram_Init(){
     TRISDbits.TRISD2 = 0; //CLOCK RAM
     TRISDbits.TRISD3 = 0; //RESET RAM
     
+    LATAbits.LA4 = 1; //ReadNotWrite
+    LATAbits.LA5 = 1; //ChipSelect
+    LATDbits.LATD2 = 0; //clock
+    LATDbits.LATD3 = 0; //reset
+    LATDbits.LATD3 = 1; //reset
+    LATDbits.LATD3 = 0; //reset
+    
+    
 }
 
 
@@ -65,6 +73,21 @@ void escribirNumeroEnPines(int valor) {
     LATEbits.LATE2 = (valor >> 5) & 0x01;
     LATEbits.LATE1 = (valor >> 6) & 0x01;
     LATEbits.LATE0 = (valor >> 7) & 0x01;
+}
+
+unsigned char leerNumeroDesdePines() {
+    unsigned char valor = 0;
+
+    valor |= (PORTDbits.RD1 & 0x01) << 0;
+    valor |= (PORTDbits.RD0 & 0x01) << 1;
+    valor |= (PORTCbits.RC2 & 0x01) << 2;
+    valor |= (PORTCbits.RC1 & 0x01) << 3;
+    valor |= (PORTCbits.RC0 & 0x01) << 4;
+    valor |= (PORTEbits.RE2 & 0x01) << 5;
+    valor |= (PORTEbits.RE1 & 0x01) << 6;
+    valor |= (PORTEbits.RE0 & 0x01) << 7;
+
+    return valor;
 }
 
 
