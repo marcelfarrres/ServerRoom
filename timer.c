@@ -8,7 +8,7 @@
 #define T0CON_CONFIG 0x80 
 #define RELOAD_TMR0 60536        
 
-#define TI_NUMTIMERS 2             // Maximum mumber of virtual timers, to be adjusted at will
+#define TI_NUMTIMERS 5             // Maximum mumber of virtual timers, to be adjusted at will
 
 // VARIABLES GLOBALS DEL TAD
 struct Timer {

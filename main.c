@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "menu.h"
 #include "eprom.h"
+#include "rgbled.h"
 
 
 
@@ -58,9 +59,11 @@ void main(void){
     AD_Init();
     selectChannel(1);
     initEusart();
+    Leds_init();
+
     
     
-    TRISAbits.RA3 = 1;
+   
    
     
     
@@ -144,7 +147,7 @@ void main(void){
         adcConversionMotor();
         logic_joystickMotor();
         menuMotor();
-       
+        rgbLedMotor();
         
 
 	}				
@@ -160,7 +163,7 @@ void enableTimerInterrups(void){
 
 void initPorts(){
 
-    TRISBbits.TRISB1 = 1; 
+    //TRISBbits.TRISB1 = 1; 
 }
 
 

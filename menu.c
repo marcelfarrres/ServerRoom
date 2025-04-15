@@ -5,6 +5,7 @@
 #include "eusart_interface.h"
 #include "eprom.h"
 #include "adcConversion.h"
+#include "rgbLed.h"
 
 
 
@@ -111,7 +112,7 @@ void printCommand(){
             sendBits(arrayPrefixes[0][2]);
             while(!numSentCorrectly());
             sendBits('-');
-            for(int re = 0; re < 10; re++){
+            for(int re = 0; re < 23; re++){
                 while(!numSentCorrectly());
                 sendBits(inputCommand[re]);
 
@@ -121,6 +122,49 @@ void printCommand(){
             while(!numSentCorrectly());
             sendBits('\n');
 }
+
+void printWord(unsigned char word){
+    
+           
+            while(!numSentCorrectly());
+            sendBits('-');
+            
+            
+            unsigned char dec = 0;
+            unsigned char num = word;
+    while (num >= 10) {
+        num -= 10;
+        dec++;
+    }
+    while(!numSentCorrectly());
+    // Decenas
+    sendBits(dec + '0');
+    while (!numSentCorrectly());
+
+    // Unidades
+    sendBits(num + '0');
+    while (!numSentCorrectly());
+            
+            
+            while(!numSentCorrectly());
+            sendBits('-');
+            while(!numSentCorrectly());
+            sendBits('\n');
+}
+
+static unsigned char year;
+static unsigned char month;
+static unsigned char day;
+static unsigned char hour;
+static unsigned char minute;
+static unsigned char lowThres;
+static unsigned char midThres;
+static unsigned char highThres;
+static unsigned char carry;
+static unsigned char pollingRate;
+
+
+
 
 void menuMotor(void) {
 	static unsigned char state = 0;
@@ -132,11 +176,6 @@ void menuMotor(void) {
 
 	switch(state) {
 		case 0:
-             
-            //printTEMP----------------
-            //printTemp();
-            //-------------------------
-            
 			if (numReceivedAtRCREG()) {
 				i = 0;
 				inputCommand[i] = receiveNumber();
@@ -161,17 +200,16 @@ void menuMotor(void) {
 		break;
 		case 3:
 			state = 0;
-            //COMMAND SEND:------------------------------
-            printCommand();
-            //-------------------------------------------
 			if (checkLOGS()) {
-                
 				i = 0;
 				a = INITIAL_LOG_POSITION;
 				totalLogsSended = 0;
 				totalLogsStored = readEPROM(0);
 				lastLogStored = readEPROM(1);
 				state = 10;
+			}
+			else if (checkINIT()) {
+				state = 15;
 			}
 		break;
 		case 4:
@@ -267,6 +305,52 @@ void menuMotor(void) {
 				}
 				state = 7;
 			}
+		break;
+		case 15:
+			year = ((inputCommand[7] - '0') * 10 ) + (inputCommand[8] - '0');
+			month = ((inputCommand[10] - '0') * 10 ) + (inputCommand[11] - '0');
+			day = ((inputCommand[13] - '0') * 10 ) + (inputCommand[14] - '0');
+			hour = ((inputCommand[16] - '0') * 10 ) + (inputCommand[17] - '0');
+			minute = ((inputCommand[19] - '0') * 10 ) + (inputCommand[20] - '0');
+			carry = 0;
+			state = 16;
+		break;
+		case 16:
+			if(inputCommand[23] == '$'){
+				pollingRate = (inputCommand[22] - '0');
+			}else{
+				pollingRate = ((inputCommand[22] - '0') * 10) + (inputCommand[23] - '0');
+				carry++;
+			}
+			state = 17;
+		break;
+		case 17:
+			if(inputCommand[25 + carry] == '$'){
+				lowThres = (inputCommand[24 + carry] - '0');
+			}else{
+				lowThres = ((inputCommand[24 + carry] - '0') * 10) + (inputCommand[25 + carry] - '0');
+				carry++;
+			}
+			state = 18;
+		break;
+		case 18:
+			if(inputCommand[27 + carry] == '$'){
+				midThres = (inputCommand[26 + carry] - '0');
+			}else{
+				midThres = ((inputCommand[26 + carry] - '0') * 10) + (inputCommand[27 + carry] - '0');
+				carry++;
+			}
+			state = 19;
+		break;
+		case 19:
+			if(inputCommand[29 + carry] == '$'){
+				highThres = (inputCommand[28 + carry] - '0');
+			}else{
+				highThres = ((inputCommand[28 + carry] - '0') * 10) + (inputCommand[29 + carry] - '0');
+				carry++;
+			}
+			setThresholds(lowThres, midThres, highThres);
+			state = 0;
 		break;
 	}
 }

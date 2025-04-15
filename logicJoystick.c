@@ -31,6 +31,7 @@ static const unsigned char buttonMessage[buttonMaxIndex] = "SELECT\r\n";
 
 void initLogicJoystick(void){
   
+    TRISAbits.RA3 = 1;
     TI_NewTimer(&buttonTimer);
     
 }
@@ -49,7 +50,7 @@ void logic_joystickMotor(void) {
 
 	switch(state) {
 		case 0:
-            if (PORTBbits.RB1 == 0) {
+            if (PORTAbits.RA3 == 0) {
 				TI_ResetTics(buttonTimer);
 				state = 4;
 			}
@@ -124,13 +125,13 @@ void logic_joystickMotor(void) {
 			}
 		break;
 		case 4:
-			if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTBbits.RB1 == 0) {
+			if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTAbits.RA3 == 0) {
 				joyIndex = 0;
 				sendBits(buttonMessage[joyIndex]);
 				joyIndex++;
 				state = 5;
 			}
-			else if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTBbits.RB1 == 1) {
+			else if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTAbits.RA3 == 1) {
 				state = 0;
 			}
 		break;
@@ -145,7 +146,7 @@ void logic_joystickMotor(void) {
 		break;
 		case 6:
            
-			if (PORTBbits.RB1 == 1) {
+			if (PORTAbits.RA3 == 1) {
 				TI_ResetTics(buttonTimer);
 				state = 7;
                 
@@ -153,10 +154,10 @@ void logic_joystickMotor(void) {
 			}
 		break;
 		case 7:
-			if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTBbits.RB1 == 1) {
+			if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTAbits.RA3 == 1) {
 				state = 0;
 			}
-			else if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTBbits.RB1 == 0) {
+			else if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTAbits.RA3 == 0) {
 				state = 6;
 			}
 		break;
