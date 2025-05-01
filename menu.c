@@ -6,6 +6,8 @@
 #include "eprom.h"
 #include "adcConversion.h"
 #include "rgbLed.h"
+#include "epromController.h"
+#include "ram.h"
 
 
 
@@ -92,6 +94,10 @@ void sendIntAsASCII(unsigned int num) {
 
     // Unidades
     sendBits(num + '0');
+    while (!numSentCorrectly());
+    sendBits('\r');
+    while (!numSentCorrectly());
+    sendBits('\n');
     while (!numSentCorrectly());
 }
 
@@ -210,6 +216,10 @@ void menuMotor(void) {
 			}
 			else if (checkINIT()) {
 				state = 15;
+			}
+			else if (checkGraf()) {
+				setReadFlag();
+				state = 20;
 			}
 		break;
 		case 4:
@@ -349,10 +359,16 @@ void menuMotor(void) {
 				highThres = ((inputCommand[28 + carry] - '0') * 10) + (inputCommand[29 + carry] - '0');
 				carry++;
 			}
+			setFrecuencia(pollingRate);
+			setMagentaLimit(highThres);
 			setThresholds(lowThres, midThres, highThres);
 			state = 0;
 		break;
+		case 20:
+			state = 0;
+		break;
 	}
+
 }
 
 

@@ -10,7 +10,7 @@ GND
 VCC: min=2.3V | typ = 3.3V | max = 5.5V
 */
 
-#define BAUDRATE 0x00 // Modify it to make I2C work at 100KHz
+#define BAUDRATE 99 // Modify it to make I2C work at 100KHz
 
 //-------------- Private functions: --------------
 void I2C_Ready();

@@ -7,6 +7,10 @@
 #include "menu.h"
 #include "eprom.h"
 #include "rgbled.h"
+#include "rtcController.h"
+#include "TAD_I2C.h"
+#include "epromController.h"
+#include "ram.h"
 
 
 
@@ -49,6 +53,23 @@ int tick_count;
 #endif
 #define _XTAL_FREQ 4000000  // Adjust based on your crystal frequency
 
+    void sendByteAsASCII(unsigned char num) {
+        unsigned char d = 0;
+        while (num >= 10) { num -= 10; d++; }
+
+        sendBits(d + '0');  // decenas
+        while (!numSentCorrectly());
+
+        sendBits(num + '0');  // unidades
+        while (!numSentCorrectly());
+        sendBits(num + '\r');  // unidades
+        while (!numSentCorrectly());
+        sendBits(num + '\n');  // unidades
+        while (!numSentCorrectly());
+        
+        
+}
+    
 void main(void){
 	
     enableTimerInterrups();
@@ -61,7 +82,10 @@ void main(void){
     initEusart();
     Leds_init();
 
+    InitI2C();
     
+    ram_Init();
+
     
    
    
@@ -70,10 +94,10 @@ void main(void){
     
     //EPROM ESCRITO MANUAL-----------------------------
     //TOTAL ESCRITOS
-    writeEEPROM(0, 15);
+    writeEEPROM(0, 14);
     while(stillWriting());
     //ULTIMO ESCRITO
-    writeEEPROM(1, 4);
+    writeEEPROM(1, 8);
     while(stillWriting());
     
     for(int r = 3; r < 17; r++){
@@ -141,14 +165,27 @@ void main(void){
         while(stillWriting());
     }
     
+
     
+    //RTC PRUEBAS-------------------------------------------------------------------------
+    //setRTC(30, 45, 13, 1, 14, 4, 24); // Esto pone: 13:45:30 lunes 14 de abril de 2024
+
+    //unsigned char sec, min, hour, day, date, month, year;
+
+    //getRTC(&sec, &min, &hour, &day, &date, &month, &year);
+
+    //sendByteAsASCII(sec);
+    //sendByteAsASCII(min);
+    //sendByteAsASCII(hour);
+    //-------------------------------------------------------------------------
 	while(1){
         
         adcConversionMotor();
         logic_joystickMotor();
         menuMotor();
         rgbLedMotor();
-        
+        epromMotor();
+        ramMotor();
 
 	}				
 }

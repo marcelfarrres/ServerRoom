@@ -43,12 +43,13 @@ void adcConversionMotor(void) {
 		case 4:
 			if (AD_SampleAvailable() == 1) {
                 goofyAhhCounter++;
-                if(i == 2 && goofyAhhCounter >= 50){
+                if(i == 2 && goofyAhhCounter >= 500){
                         ansArray[i] = ((AD_GetSample_10bits() * 100) / 205) - 50;
+                        //ansArray[i] = AD_GetSample_8bits();
                         
                         goofyAhhCounter = 0;
                   
-                }else{
+                }else if(i != 2){
                     ansArray[i] = AD_GetSample_10bits();
                     
                 }
