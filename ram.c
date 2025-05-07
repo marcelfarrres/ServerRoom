@@ -11,9 +11,14 @@
 #define LOG_LENGTH 14
 
 static unsigned char timerRam = 0;
-static unsigned char frecuencia = 2;
+static int frecuencia = 2000;
 static unsigned char readFlag = 0;
 static unsigned char generalIndex = 0;
+
+void resetRam(){
+    generalIndex = 0;
+    frecuencia = 2000;
+}
 
 void ram_Init(){
     TI_NewTimer(&timerRam);

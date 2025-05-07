@@ -5,5 +5,6 @@ void ram_Init();
 void setFrecuencia(unsigned char pollingRate);
 void setReadFlag();
 void ramMotor(void);
+void resetRam();
 
 #endif	

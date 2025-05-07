@@ -1,5 +1,6 @@
 #include <xc.h>
 #include "TAD_I2C.h"
+#include "eusart_interface.h"
 
 //-------------- Private functions: --------------
 
@@ -36,6 +37,8 @@ void InitI2C()
   SSPADD = BAUDRATE;
   PIE1bits.SSPIE=1;
   PIR1bits.SSPIF=0;
+  
+  TRISBbits.RB0 = 1;
 }
 
 

@@ -11,6 +11,7 @@
 #include "TAD_I2C.h"
 #include "epromController.h"
 #include "ram.h"
+#include "fans.h"
 
 
 
@@ -62,9 +63,9 @@ int tick_count;
 
         sendBits(num + '0');  // unidades
         while (!numSentCorrectly());
-        sendBits(num + '\r');  // unidades
+        sendBits('\r');  // unidades
         while (!numSentCorrectly());
-        sendBits(num + '\n');  // unidades
+        sendBits('\n');  // unidades
         while (!numSentCorrectly());
         
         
@@ -81,12 +82,15 @@ void main(void){
     selectChannel(1);
     initEusart();
     Leds_init();
+    ram_Init();
 
     InitI2C();
     
-    ram_Init();
-
     
+
+    initFans();
+    
+    INTCONbits.PEIE = 0;
    
    
     
@@ -94,12 +98,13 @@ void main(void){
     
     //EPROM ESCRITO MANUAL-----------------------------
     //TOTAL ESCRITOS
-    writeEEPROM(0, 14);
+    
+    writeEEPROM(0, 0);
     while(stillWriting());
     //ULTIMO ESCRITO
-    writeEEPROM(1, 8);
+    writeEEPROM(1, 0);
     while(stillWriting());
-    
+    /*
     for(int r = 3; r < 17; r++){
         writeEEPROM(r,1);
         while(stillWriting());
@@ -165,7 +170,7 @@ void main(void){
         while(stillWriting());
     }
     
-
+     */
     
     //RTC PRUEBAS-------------------------------------------------------------------------
     //setRTC(30, 45, 13, 1, 14, 4, 24); // Esto pone: 13:45:30 lunes 14 de abril de 2024
@@ -186,6 +191,7 @@ void main(void){
         rgbLedMotor();
         epromMotor();
         ramMotor();
+        fansMotor();
 
 	}				
 }

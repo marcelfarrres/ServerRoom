@@ -5,6 +5,7 @@
 #include "eusart_interface.h"
 #include "adcConversion.h"
 #include "timer.h"
+#include "rtcController.h"
 
 
 #define HIGH_THRESHOLD 1000
@@ -129,6 +130,7 @@ void logic_joystickMotor(void) {
 				joyIndex = 0;
 				sendBits(buttonMessage[joyIndex]);
 				joyIndex++;
+                
 				state = 5;
 			}
 			else if (TI_GetTics(buttonTimer) >= TI_BOUNCES && PORTAbits.RA3 == 1) {

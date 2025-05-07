@@ -56,6 +56,14 @@ char checkGraf(){
     }
 }
 
+char checkReset(){
+    if(inputCommand[0] == 'R' && inputCommand[1] == 'E' && inputCommand[2] == 'S' && inputCommand[3] == 'E' ){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
 
 void sendIntAsASCII(unsigned int num) {
     unsigned char d;
@@ -221,6 +229,11 @@ void menuMotor(void) {
 				setReadFlag();
 				state = 20;
 			}
+			else if (checkReset()) {
+				resetRam();
+				writeEEPROM(0,0);
+				state = 21;
+			}
 		break;
 		case 4:
 			if (numSentCorrectly()) {
@@ -366,6 +379,17 @@ void menuMotor(void) {
 		break;
 		case 20:
 			state = 0;
+		break;
+		case 21:
+			if (!stillWriting()) {
+				writeEEPROM(1,0);
+				state = 22;
+			}
+		break;
+		case 22:
+			if (!stillWriting()) {
+				state = 0;
+			}
 		break;
 	}
 
