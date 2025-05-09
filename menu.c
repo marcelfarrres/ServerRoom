@@ -8,6 +8,7 @@
 #include "rgbLed.h"
 #include "epromController.h"
 #include "ram.h"
+#include "rtcController.h"
 
 
 
@@ -58,6 +59,14 @@ char checkGraf(){
 
 char checkReset(){
     if(inputCommand[0] == 'R' && inputCommand[1] == 'E' && inputCommand[2] == 'S' && inputCommand[3] == 'E' ){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+char checkTime(){
+    if(inputCommand[0] == 'T' && inputCommand[1] == 'I' && inputCommand[2] == 'M' && inputCommand[3] == 'E' ){
         return 1;
     }else{
         return 0;
@@ -336,8 +345,12 @@ void menuMotor(void) {
 			hour = ((inputCommand[16] - '0') * 10 ) + (inputCommand[17] - '0');
 			minute = ((inputCommand[19] - '0') * 10 ) + (inputCommand[20] - '0');
 			carry = 0;
-			state = 16;
+			state = 23;
 		break;
+        case 23:
+            setRTC(0, minute, hour, 1, day, month, year);
+            state = 16;
+            break;
 		case 16:
 			if(inputCommand[23] == '$'){
 				pollingRate = (inputCommand[22] - '0');
