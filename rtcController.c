@@ -4,15 +4,6 @@
 
 #include "TAD_I2C.h"
 
-unsigned char toBCD(unsigned char n) {
-    unsigned char dec = 0;
-    while (n >= 10) { n -= 10; dec++; }
-    return (dec << 4) | n;
-}
-
-unsigned char fromBCD(unsigned char bcd) {
-    return ((bcd >> 4) * 10) + (bcd & 0x0F);
-}
 
 
 void setRTC(
@@ -27,13 +18,13 @@ void setRTC(
     StartI2C(0xD0);         // Dirección RTC escritura
     I2C_Write(0x00);        // Comienza en el registro de segundos
 
-    I2C_Write(toBCD(sec));
-    I2C_Write(toBCD(min));
-    I2C_Write(toBCD(hour));
-    I2C_Write(toBCD(day));
-    I2C_Write(toBCD(date));
-    I2C_Write(toBCD(month));
-    I2C_Write(toBCD(year));
+    I2C_Write(sec);
+    I2C_Write(min);
+    I2C_Write(hour);
+    I2C_Write(day);
+    I2C_Write(date);
+    I2C_Write(month);
+    I2C_Write(year);
 
     I2C_Stop_();
 }
@@ -51,14 +42,43 @@ void getRTC(
     I2C_Write(0x00);       // Comenzamos desde el registro 0
     ReStartI2C_(0xD1);     // Dirección lectura
 
-    *sec   = fromBCD(I2C_Read(0));
-    *min   = fromBCD(I2C_Read(0));
-    *hour  = fromBCD(I2C_Read(0));
-    *day   = fromBCD(I2C_Read(0));
-    *date  = fromBCD(I2C_Read(0));
-    *month = fromBCD(I2C_Read(0));
-    *year  = fromBCD(I2C_Read(1));  // Último byte con NACK
+    *sec   = I2C_Read(0);
+    *min   = I2C_Read(0);
+    *hour  = I2C_Read(0);
+    *day   = I2C_Read(0);
+    *date  = I2C_Read(0);
+    *month = I2C_Read(0);
+    *year  = I2C_Read(1);  // Último byte con NACK
 
     I2C_Stop_();
 }
+
+
+void enableMinuteAlarm() {
+    // Configurar los registros de la alarma 1
+    StartI2C(0xD0);  // Dirección escritura RTC
+    I2C_Write(0x07); // Dirección del primer registro de Alarm 1
+    
+    I2C_Write(0b10000000); // Ignora los segundos (A1M1)
+    I2C_Write(0b00000000); // Verifica los minutos (A1M2)
+    I2C_Write(0b10000000); // Ignora las horas (A1M3)
+    I2C_Write(0b10000000); // Ignora el día/fecha (A1M4)
+    
+    I2C_Stop_();
+
+    // Configurar el registro de control para activar Alarm 1
+    StartI2C(0xD0);
+    I2C_Write(0x0E);
+    I2C_Write(0b00000101); // Habilitar Alarm 1 y desactivar 32kHz, SQW en modo interrupción
+    I2C_Stop_();
+}
+
+void clearAlarmFlag() {
+    StartI2C(0xD0);
+    I2C_Write(0x0F);
+    I2C_Write(0b00000000); // Limpiar el flag de Alarm 1
+    I2C_Stop_();
+}
+
+
 

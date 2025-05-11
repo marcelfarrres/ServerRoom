@@ -22,4 +22,6 @@ void getRTC(
     unsigned char *year
 );
 
+void enableMinuteAlarm();
+void clearAlarmFlag();
 #endif

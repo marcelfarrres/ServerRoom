@@ -65,7 +65,7 @@ char checkReset(){
     }
 }
 
-char checkTime(){
+char checkTIME(){
     if(inputCommand[0] == 'T' && inputCommand[1] == 'I' && inputCommand[2] == 'M' && inputCommand[3] == 'E' ){
         return 1;
     }else{
@@ -187,6 +187,11 @@ static unsigned char carry;
 static unsigned char pollingRate;
 
 
+static unsigned char sec = 0x54;
+
+static unsigned char date = 0x25;
+
+
 
 
 void menuMotor(void) {
@@ -241,7 +246,15 @@ void menuMotor(void) {
 			else if (checkReset()) {
 				resetRam();
 				writeEEPROM(0,0);
+				setSystemState(0);
 				state = 21;
+			}
+			else if (checkTIME()) {
+				state = 24;
+			}
+			else if (PORTBbits.RB0 == 0) {
+				getRTC(&sec, &minute, &hour, &date, &day, &month, &year);
+				state = 26;
 			}
 		break;
 		case 4:
@@ -339,18 +352,19 @@ void menuMotor(void) {
 			}
 		break;
 		case 15:
-			year = ((inputCommand[7] - '0') * 10 ) + (inputCommand[8] - '0');
-			month = ((inputCommand[10] - '0') * 10 ) + (inputCommand[11] - '0');
-			day = ((inputCommand[13] - '0') * 10 ) + (inputCommand[14] - '0');
-			hour = ((inputCommand[16] - '0') * 10 ) + (inputCommand[17] - '0');
-			minute = ((inputCommand[19] - '0') * 10 ) + (inputCommand[20] - '0');
+			//year = ((inputCommand[7] - '0') * 10 ) + (inputCommand[8] - '0');
+			year = ((inputCommand[7] - '0') << 4) | ( (inputCommand[8] - '0') & 0x0F);
+			//month = ((inputCommand[10] - '0') * 10 ) + (inputCommand[11] - '0');
+			month = (((inputCommand[10] - '0') << 4) | ((inputCommand[11] - '0') & 0x0F));
+			//day = ((inputCommand[13] - '0') * 10 ) + (inputCommand[14] - '0');
+			day = (((inputCommand[13] - '0') << 4) | ((inputCommand[14] - '0') & 0x0F));
+			//hour = ((inputCommand[16] - '0') * 10 ) + (inputCommand[17] - '0');
+			hour = (((inputCommand[16] - '0') << 4) | ((inputCommand[17] - '0') & 0x0F));
+			//minute = ((inputCommand[19] - '0') * 10 ) + (inputCommand[20] - '0');
+			minute = (((inputCommand[19] - '0') << 4) | ((inputCommand[20] - '0') & 0x0F));
 			carry = 0;
 			state = 23;
 		break;
-        case 23:
-            setRTC(0, minute, hour, 1, day, month, year);
-            state = 16;
-            break;
 		case 16:
 			if(inputCommand[23] == '$'){
 				pollingRate = (inputCommand[22] - '0');
@@ -388,6 +402,7 @@ void menuMotor(void) {
 			setFrecuencia(pollingRate);
 			setMagentaLimit(highThres);
 			setThresholds(lowThres, midThres, highThres);
+			setSystemState(1);
 			state = 0;
 		break;
 		case 20:
@@ -404,8 +419,79 @@ void menuMotor(void) {
 				state = 0;
 			}
 		break;
+		case 23:
+			setRTC(0, minute, hour, 1, day, month, year);
+			state = 16;
+		break;
+		case 24:
+			hour = (((inputCommand[5] - '0') << 4) | ((inputCommand[6] - '0') & 0x0F));
+			minute = (((inputCommand[8] - '0') << 4) | ((inputCommand[9] - '0') & 0x0F));
+			state = 25;
+		break;
+		case 25:
+			setRTC(0, minute, hour, 1, day, month, year);
+			state = 0;
+		break;
+		case 26:
+			sendBits('U');
+			state = 27;
+		break;
+		case 27:
+			if (numSentCorrectly()) {
+				sendBits('P');
+				state = 28;
+			}
+		break;
+		case 28:
+			if (numSentCorrectly()) {
+				sendBits('D');
+				state = 29;
+			}
+		break;
+		case 29:
+			if (numSentCorrectly()) {
+				sendBits( ((hour >> 4) & 0x0F) + '0');
+				state = 30;
+			}
+		break;
+		case 30:
+			if (numSentCorrectly()) {
+				sendBits( ( hour & 0x0F) + '0');
+				state = 31;
+			}
+		break;
+		case 31:
+			if (numSentCorrectly()) {
+				sendBits(':');
+				state = 32;
+			}
+		break;
+		case 32:
+			if (numSentCorrectly()) {
+				sendBits( ((minute >> 4) & 0x0F) + '0');
+				state = 33;
+			}
+		break;
+		case 33:
+			if (numSentCorrectly()) {
+				sendBits( ( minute & 0x0F) + '0');
+				state = 34;
+			}
+		break;
+		case 34:
+			if (numSentCorrectly()) {
+				sendBits('\r');
+				state = 35;
+			}
+		break;
+		case 35:
+			if (numSentCorrectly()) {
+				sendBits('\n');
+				clearAlarmFlag();
+				state = 0;
+			}
+		break;
 	}
-
 }
 
 

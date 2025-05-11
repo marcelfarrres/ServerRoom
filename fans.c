@@ -24,6 +24,11 @@ void fansMotor(void) {
 
 	switch(state) {
 		case 0:
+            if(getSystemState() == 0){
+                LATDbits.LATD4 = 0;
+				LATDbits.LATD5 = 0;
+                break;
+            }
 			TI_ResetTics(timerFan);
 			if(getRoomState() == 0){
 				LATDbits.LATD4 = 1;

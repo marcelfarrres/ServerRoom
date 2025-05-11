@@ -31,7 +31,6 @@ void HighInterruptRSI(void);
 void main(void);
 
 void enableTimerInterrups(void);
-void initPorts();
 
 
 int tick_count;
@@ -54,51 +53,27 @@ int tick_count;
 #endif
 #define _XTAL_FREQ 4000000  // Adjust based on your crystal frequency
 
-    void sendByteAsASCII(unsigned char num) {
-        unsigned char d = 0;
-        while (num >= 10) { num -= 10; d++; }
-
-        sendBits(d + '0');  // decenas
-        while (!numSentCorrectly());
-
-        sendBits(num + '0');  // unidades
-        while (!numSentCorrectly());
-        sendBits('\r');  // unidades
-        while (!numSentCorrectly());
-        sendBits('\n');  // unidades
-        while (!numSentCorrectly());
-        
-        
-}
-    
 void main(void){
 	
     enableTimerInterrups();
     TI_Init();
-    initPorts();
     initLogicJoystick();
-
     AD_Init();
     selectChannel(1);
     initEusart();
-    Leds_init();
+    
     ram_Init();
-
+    
     InitI2C();
-    
-    
-
     initFans();
+    Leds_init();
     
     INTCONbits.PEIE = 0;
-   
-   
-    
-    
-    
+    TRISBbits.RB0 = 1;
+    enableMinuteAlarm();
+ 
     //EPROM ESCRITO MANUAL-----------------------------
     //TOTAL ESCRITOS
-    
     writeEEPROM(0, 0);
     while(stillWriting());
     //ULTIMO ESCRITO
@@ -109,80 +84,10 @@ void main(void){
         writeEEPROM(r,1);
         while(stillWriting());
     }
-    for(int r = 17; r < 31; r++){
-        writeEEPROM(r,2);
-        while(stillWriting());
-    }
-    for(int r = 31; r < 45; r++){
-        writeEEPROM(r,3);
-        while(stillWriting());
-    }
-    for(int r = 45; r < 59; r++){
-        writeEEPROM(r,4);
-        while(stillWriting());
-    }
-    for(int r = 59; r < 73; r++){
-        writeEEPROM(r,5);
-        while(stillWriting());
-    }
-    for(int r = 73; r < 87; r++){
-        writeEEPROM(r,6);
-        while(stillWriting());
-    }
-    for(int r = 87; r < 101; r++){
-        writeEEPROM(r,7);
-        while(stillWriting());
-    }
-    for(int r = 101; r < 115; r++){
-        writeEEPROM(r,8);
-        while(stillWriting());
-    }
-    for(int r = 115; r < 129; r++){
-        writeEEPROM(r,9);
-        while(stillWriting());
-    }
-    for(int r = 129; r < 143; r++){
-        writeEEPROM(r,0);
-        while(stillWriting());
-    }
-    for(int r = 143; r < 157; r++){
-        writeEEPROM(r,0);
-        while(stillWriting());
-    }
-    for(int r = 157; r < 171; r++){
-        writeEEPROM(r,1);
-        while(stillWriting());
-    }
-    for(int r = 171; r < 185; r++){
-        writeEEPROM(r,1);
-        while(stillWriting());
-    }
-    for(int r = 185; r < 199; r++){
-        writeEEPROM(r,0);
-        while(stillWriting());
-    }
-    for(int r = 199; r < 213; r++){
-        writeEEPROM(r,0);
-        while(stillWriting());
-    }
-    for(int r = 213; r < 226; r++){
-        writeEEPROM(r,7);
-        while(stillWriting());
-    }
-    
      */
     
-    //RTC PRUEBAS-------------------------------------------------------------------------
-    //setRTC(30, 45, 13, 1, 14, 4, 24); // Esto pone: 13:45:30 lunes 14 de abril de 2024
-
-    //unsigned char sec, min, hour, day, date, month, year;
-
-    //getRTC(&sec, &min, &hour, &day, &date, &month, &year);
-
-    //sendByteAsASCII(sec);
-    //sendByteAsASCII(min);
-    //sendByteAsASCII(hour);
-    //-------------------------------------------------------------------------
+    //receiveNumber();
+  
 	while(1){
         
         adcConversionMotor();
@@ -204,10 +109,6 @@ void enableTimerInterrups(void){
   
 }
 
-void initPorts(){
-
-    //TRISBbits.TRISB1 = 1; 
-}
 
 
 
