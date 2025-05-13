@@ -23,5 +23,6 @@ void getRTC(
 );
 
 void enableMinuteAlarm();
-void clearAlarmFlag();
+
+void clearAlarm2Flag();
 #endif

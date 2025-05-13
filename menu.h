@@ -4,6 +4,7 @@
 void menuMotor(void);
 void printTemp();
 void sendIntAsASCII(unsigned int num);
+void ramFinished();
 
 #endif	
 

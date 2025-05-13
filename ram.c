@@ -229,6 +229,7 @@ void ramMotor(void) {
 				state = 15;
 			}
 			else if (i >= 5) {
+                ramFinished();
 				state = 0;
 			}
 		break;

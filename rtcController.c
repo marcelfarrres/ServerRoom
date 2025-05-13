@@ -52,33 +52,30 @@ void getRTC(
 
     I2C_Stop_();
 }
-
-
 void enableMinuteAlarm() {
-    // Configurar los registros de la alarma 1
-    StartI2C(0xD0);  // Dirección escritura RTC
-    I2C_Write(0x07); // Dirección del primer registro de Alarm 1
     
-    I2C_Write(0b10000000); // Ignora los segundos (A1M1)
-    I2C_Write(0b00000000); // Verifica los minutos (A1M2)
-    I2C_Write(0b10000000); // Ignora las horas (A1M3)
-    I2C_Write(0b10000000); // Ignora el día/fecha (A1M4)
+    StartI2C(0xD0); 
+    I2C_Write(0x07);
     
+   
+    I2C_Write(0b01011001); 
+    I2C_Write(0b10000000); 
+    I2C_Write(0b10000000);
+    I2C_Write(0b10000000);
     I2C_Stop_();
-
-    // Configurar el registro de control para activar Alarm 1
+    
+   
     StartI2C(0xD0);
     I2C_Write(0x0E);
-    I2C_Write(0b00000101); // Habilitar Alarm 1 y desactivar 32kHz, SQW en modo interrupción
+    I2C_Write(0b00000101); 
     I2C_Stop_();
 }
 
-void clearAlarmFlag() {
+
+void clearAlarm2Flag() {
     StartI2C(0xD0);
-    I2C_Write(0x0F);
-    I2C_Write(0b00000000); // Limpiar el flag de Alarm 1
+    I2C_Write(0x0F); // Dirección del registro de estado
+    I2C_Write(0b00000000); // Limpiar todos los flags
     I2C_Stop_();
 }
-
-
 

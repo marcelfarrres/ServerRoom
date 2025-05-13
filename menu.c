@@ -174,6 +174,11 @@ void printWord(unsigned char word){
             while(!numSentCorrectly());
             sendBits('\n');
 }
+static unsigned char ramFinite = 0;
+
+void ramFinished(){
+    ramFinite = 1;
+}
 
 static unsigned char year;
 static unsigned char month;
@@ -210,6 +215,14 @@ void menuMotor(void) {
 				i++;
 				state = 1;
 			}
+            
+            else if (PORTBbits.RB0 == 0) {
+                //printWord(99);
+				getRTC(&sec, &minute, &hour, &date, &day, &month, &year);
+				state = 26;
+				//state = 0;
+			}
+             
 		break;
 		case 1:
 			if (numReceivedAtRCREG()) {
@@ -252,10 +265,10 @@ void menuMotor(void) {
 			else if (checkTIME()) {
 				state = 24;
 			}
-			else if (PORTBbits.RB0 == 0) {
-				getRTC(&sec, &minute, &hour, &date, &day, &month, &year);
-				state = 26;
-			}
+            
+			
+              
+             
 		break;
 		case 4:
 			if (numSentCorrectly()) {
@@ -406,7 +419,11 @@ void menuMotor(void) {
 			state = 0;
 		break;
 		case 20:
-			state = 0;
+            if(ramFinite == 1){
+                ramFinite = 0;
+                state = 0;
+            }
+			
 		break;
 		case 21:
 			if (!stillWriting()) {
@@ -487,11 +504,14 @@ void menuMotor(void) {
 		case 35:
 			if (numSentCorrectly()) {
 				sendBits('\n');
-				clearAlarmFlag();
+                
+				clearAlarm2Flag();
+                
 				state = 0;
 			}
 		break;
 	}
+
 }
 
 
