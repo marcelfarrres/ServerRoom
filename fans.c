@@ -24,36 +24,38 @@ void fansMotor(void) {
 
 	switch(state) {
 		case 0:
-            LATDbits.LATD5 = 1;
+            //LATDbits.LATD5 = 1;
             if(getSystemState() == 0){
                 LATDbits.LATD4 = 0;
-				//LATDbits.LATD5 = 0;
+				LATDbits.LATD5 = 0;
                 break;
             }
 			TI_ResetTics(timerFan);
 			if(getRoomState() == 0){
 				LATDbits.LATD4 = 1;
-				//LATDbits.LATD5 = 0;
-				timeHigh = 2;
+				LATDbits.LATD5 = 0;
+				timeHigh = 1;
 			}else if(getRoomState() == 1){
 				LATDbits.LATD4 = 1;
-				//LATDbits.LATD5 = 1;
-				timeHigh = 2;
+				LATDbits.LATD5 = 1;
+				timeHigh = 3;
 			}else if(getRoomState() == 2){
 				LATDbits.LATD4 = 1;
-				//LATDbits.LATD5 = 1;
-				timeHigh = 4;
+				LATDbits.LATD5 = 1;
+				timeHigh = 5;
 			}else{
 				LATDbits.LATD4 = 0;
-				//LATDbits.LATD5 = 0;
+				LATDbits.LATD5 = 0;
 			}
 			state = 1;
 		break;
 		case 1:
 			if (TI_GetTics(timerFan) >= timeHigh) {
 				TI_ResetTics(timerFan);
-				LATDbits.LATD4 = 0;
-				//LATDbits.LATD5 = 0;
+                if(getRoomState() != 2){
+                    LATDbits.LATD4 = 0;
+                    LATDbits.LATD5 = 0;
+                }
 				state = 2;
 			}
 		break;

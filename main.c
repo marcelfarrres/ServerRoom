@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <pic18f4321.h>
 #include "adc_interface.h"
 #include "eusart_interface.h"
 #include "adcConversion.h"
@@ -71,14 +72,23 @@ void main(void){
     INTCONbits.PEIE = 0;
     TRISBbits.RB0 = 1;
     enableMinuteAlarm();
+    TRISDbits.RD7 = 0;
+    LATDbits.LATD7 = 0;
  
     //EPROM ESCRITO MANUAL-----------------------------
     //TOTAL ESCRITOS
-    writeEEPROM(0, 0);
-    while(stillWriting());
+    
+    if(readEPROM(0) == 'F'){
+        writeEEPROM(0,0);
+        while(stillWriting());
+        writeEEPROM(1,0);
+        while(stillWriting());
+    }
+    //writeEEPROM(0,0);
+    //while(stillWriting());
     //ULTIMO ESCRITO
-    writeEEPROM(1, 0);
-    while(stillWriting());
+    //writeEEPROM(1, 0);
+    //while(stillWriting());
     /*
     for(int r = 3; r < 17; r++){
         writeEEPROM(r,1);
@@ -97,6 +107,7 @@ void main(void){
         epromMotor();
         ramMotor();
         fansMotor();
+        LATDbits.LATD7 = !LATDbits.LATD7;
 
 	}				
 }

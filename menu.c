@@ -247,6 +247,9 @@ void menuMotor(void) {
 				totalLogsSended = 0;
 				totalLogsStored = readEPROM(0);
 				lastLogStored = readEPROM(1);
+                printWord(totalLogsStored);
+                printWord(lastLogStored);
+                
 				state = 10;
 			}
 			else if (checkINIT()) {
